@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormControl, FormBuilder, Validators, FormArray } from '@angular/forms';
 import { CustomValidators } from '../shared/custom.validators';
+import { _getComponentHostLElementNode } from '@angular/core/src/render3/instructions';
 
 @Component({
   selector: 'app-create-employee',
@@ -46,6 +47,7 @@ export class CreateEmployeeComponent implements OnInit {
     },
     'emailGroup':
     {
+      // look at the object return from matchEmails: return { 'emailMismatch': true };
       'emailMismatch': 'Email and Confirms Email do not match'
     },
     'phone': {
@@ -71,7 +73,7 @@ export class CreateEmployeeComponent implements OnInit {
   formErrors = {
     'fullname': '',
     'email': '',
-    'emailGroup':'',
+    'emailGroup': '',
     'confirmEmail': '',
     'phone': '',
     'skillname': '',
@@ -83,17 +85,6 @@ export class CreateEmployeeComponent implements OnInit {
   constructor(private fb: FormBuilder) { }
 
   ngOnInit() {
-    /*
-    this.employeeForm = new FormGroup({
-      fullname: new FormControl(''),
-      email: new FormControl(''),
-      skills: new FormGroup({
-        skillname: new FormControl(''),
-        experienceInYears: new FormControl(''),
-        proficiency: new FormControl(''),
-      }),
-    });
-    */
 
     this.employeeForm = this.fb.group({
       fullname: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(10)]],
@@ -261,12 +252,71 @@ export class CreateEmployeeComponent implements OnInit {
   // required validator function otherwise remove it
   onContactPrefernceChange(selectedValue: string) {
     const phoneFormControl = this.employeeForm.get('phone');
+    //                       this.employeeForm.controls.emailGroup
+    const emailFormControl = this.employeeForm.controls['emailGroup'];
     if (selectedValue === 'phone') {
       phoneFormControl.setValidators(Validators.required);
+      emailFormControl.get('email').clearValidators();
+      console.log(phoneFormControl);
+      emailFormControl.get('confirmEmail').clearValidators();
     } else {
       phoneFormControl.clearValidators();
+      emailFormControl.setValidators(Validators.required);
     }
     phoneFormControl.updateValueAndValidity();
+    emailFormControl.updateValueAndValidity();
+  }
+
+  onArrayForm() {
+    /*
+    FormArray contain an array of FormControls, FormGroups, nested FormArray.
+    Some FormArray properties: touched, valid, dirty, untouched, invalid, pristine.
+    Some FormArray methods: push, insert, removeAt, serControl, at.
+     */
+    const formArray = new FormArray([
+      new FormControl('', Validators.required),
+      new FormGroup({
+        country: new FormControl('', Validators.required)
+      }),
+      new FormArray([])
+    ]);
+
+    console.log(formArray.length);
+
+    for (const control of formArray.controls) {
+      // instanceof FormControl || FormGrouo || FormArray
+      if (control instanceof FormControl) {
+        console.log('instanceof FormControl');
+      }
+    }
+
+    // FormBuilder.array();
+    const formArray1 = this.fb.array([
+      new FormControl('John', Validators.required),
+      new FormControl('IT', Validators.required),
+      new FormControl('', Validators.required),
+    ]);
+
+    console.log(formArray1.valid);
+
+    formArray1.push(new FormControl('', Validators.required));
+    console.log(formArray1.at(2));
+
+    // group() vs array() :
+    const formGroup = this.fb.group([
+      new FormControl('John', Validators.required),
+      new FormControl('IT', Validators.required),
+      new FormControl('', Validators.required),
+    ]);
+
+    console.log(formGroup);
+    // form group is serialized as an object:
+    // .controls: {0: FormControl, 1: FormControl, 2: FormControl }}
+    console.log(formArray1);
+    // form array data is serialized as an array:
+    // .controls: (3) [FormControl, FormControl, FormControl]
+    // with form array track control as part of an array is very usefull
+    // when want generate from groups and forms controls dynamically.
   }
 
 }
