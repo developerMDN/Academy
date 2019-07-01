@@ -44,16 +44,14 @@
               Email
             </label>
             <div class="col-sm-8">
-              <input formControlName="email" type="text" class="form-control" id="email"
-              (blur)="logValidationErrors()">
+              <input formControlName="email" type="text" class="form-control" id="email" (blur)="logValidationErrors()">
               <span class="has-error text-error" *ngIf="formErrors.email">
                 {{formErrors.email}}
               </span>
             </div>
           </div>
 
-          <div class="form-group"
-          [ngClass]="{'has-error': formErrors.confirmEmail || formErrors.emailGroup}">
+          <div class="form-group" [ngClass]="{'has-error': formErrors.confirmEmail || formErrors.emailGroup}">
             <label for="email" class="col-sm-4 control-label">
               Confirm Email
             </label>
@@ -81,62 +79,86 @@
       </div>
     </div>
 
-    <div formGroupName="skills">
-      <div class="form-row">
-        <div class="col-md-8">
-          <label for="skillname" class="col-sm-2 control-label">
-            Skills
-          </label>
+    <div class="card-body">
+      <div class="form-group">
+        <div class="col-md-offset-2 col-md-4">
+          <button type="button" class="btn btn-primary" (click)="addSkillClick()">
+            Add Skill
+          </button>
         </div>
       </div>
-      <div class="form-row">
-        <div class="col-md-4">
-          <input type="text" class="form-control" formControlName="skillname" id="skillname" placeholder="Name"
-            (blur)="logValidationErrors()">
-          <span class="has-error text-error" *ngIf="formErrors.skillname">
-            {{formErrors.skillname}}
-          </span>
-        </div>
-        <div class="col-md-3">
-          <input type="text" class="form-control" formControlName="experienceInYears" id="experienceInYears"
-            placeholder="Experience In Years" (blur)="logValidationErrors()">
-          <span class="has-error text-error" *ngIf="formErrors.experienceInYears">
-            {{formErrors.experienceInYears}}
-          </span>
-        </div>
-      </div>
-      <br>
-      <label for="proficiency" class="col-sm-2 control-label">
-        Proficiency
-      </label>
-      <div class="form-gruop" [ngClass]="{'has-error text-error': formErrors.proficiency}">
-        <div class="form-check-inline">
-          <label class="form-check-label">
-            <input formControlName="proficiency" type="radio" id=proficiency value='beginner'
-              (blur)="logValidationErrors()">
-            Beginner
-          </label>
-        </div>
-        <div class="form-check-inline">
-          <label class="form-check-label">
-            <input formControlName="proficiency" type="radio" id=proficiency value='intermediate'
-              (blur)="logValidationErrors()">
-            Intermediate
-          </label>
-        </div>
-        <div class="form-check-inline disabled">
-          <label class="form-check-label">
-            <input formControlName="proficiency" type="radio" id=proficiency value='advanced'
-              (blur)="logValidationErrors()">
-            Advanced
-          </label>
-          <span class="help-block" *ngIf="formErrors.proficiency">
-            {{formErrors.proficiency}}
-          </span>
+
+      <div formArrayName="skills">
+
+        <div [formGroupName]="i" *ngFor="let skill of this.employeeForm.get('skills').controls; index as i">
+
+          <div class="form-row">
+            <div class="col-md-8">
+              <label [attr.for]="'skillname'+i" class="col-sm-2 control-label">
+                Skills
+              </label>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="col-md-4">
+              <!--
+                to asign the id to the controls generate dynamicalli,
+                can use interpolation id="{{'skillname'+i}}" or use proporty binding syntax
+                [id]="'skillName'+1"
+              -->
+              <input type="text" class="form-control" formControlName="skillname" [id]="'skillname'+i"
+                placeholder="Name" (blur)="logValidationErrors()">
+              <span class="has-error text-error" *ngIf="formErrors.skillname">
+                {{formErrors.skillname}}
+              </span>
+            </div>
+            <div class="col-md-3">
+              <input type="text" class="form-control" formControlName="experienceInYears" id="{{'experienceInYears'+i}}"
+                placeholder="Experience In Years" (blur)="logValidationErrors()">
+              <span class="has-error text-error" *ngIf="formErrors.experienceInYears">
+                {{formErrors.experienceInYears}}
+              </span>
+            </div>
+          </div>
+          <br>
+          <div class="form-row">
+            <div class="col-md-12">
+              <label for="proficiency" class="col-sm-2 control-label">
+                Proficiency
+              </label>
+            </div>
+          </div>
+          <div class="form-gruop" [ngClass]="{'has-error text-error': formErrors.proficiency}">
+            <div class="form-check-inline">
+              <label class="form-check-label">
+                <input formControlName="proficiency" type="radio" id=proficiency value='beginner'
+                  (blur)="logValidationErrors()">
+                Beginner
+              </label>
+            </div>
+            <div class="form-check-inline">
+              <label class="form-check-label">
+                <input formControlName="proficiency" type="radio" id=proficiency value='intermediate'
+                  (blur)="logValidationErrors()">
+                Intermediate
+              </label>
+            </div>
+            <div class="form-check-inline disabled">
+              <label class="form-check-label">
+                <input formControlName="proficiency" type="radio" id=proficiency value='advanced'
+                  (blur)="logValidationErrors()">
+                Advanced
+              </label>
+              <span class="help-block" *ngIf="formErrors.proficiency">
+                {{formErrors.proficiency}}
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
+
   <div class="card-footer">
     <button class="btn btn-primary" type="submit">Save</button>
     <button class="btn btn-primary ml-2" type="button" (click)="onLoadData()">Load</button>

@@ -94,11 +94,9 @@ export class CreateEmployeeComponent implements OnInit {
         confirmEmail: ['', Validators.required],
       }, { validator: CustomValidators.matchEmails }),
       phone: [''],
-      skills: this.fb.group({
-        skillname: ['', Validators.required],
-        experienceInYears: ['', Validators.required],
-        proficiency: ['', Validators.required]
-      }),
+      skills: this.fb.array([
+        this.addSkillFormGroup()
+      ]),
     });
 
     /*
@@ -145,6 +143,19 @@ export class CreateEmployeeComponent implements OnInit {
       Validate:
      */
     console.log('fullname is valid? ', this.employeeForm.controls.fullname.valid);
+  }
+
+  addSkillClick(): void {
+    // (<FormArray>this.employeeForm.get('skills')).push(this.addSkillFormGroup());
+    (this.employeeForm.get('skills') as FormArray).push(this.addSkillFormGroup());
+  }
+
+  addSkillFormGroup(): FormGroup {
+    return this.fb.group({
+      skillname: ['', Validators.required],
+      experienceInYears: ['', Validators.required],
+      proficiency: ['', Validators.required]
+    });
   }
 
   /*
@@ -239,6 +250,14 @@ export class CreateEmployeeComponent implements OnInit {
       }
       if (abstractControl instanceof FormGroup) {
         this.logValidationErrors(abstractControl);
+      }
+
+      if (abstractControl instanceof FormArray) {
+        for (const control of abstractControl.controls) {
+          if (control instanceof FormGroup) {
+            this.logValidationErrors(control);
+          }
+        }
       }
     });
   }
